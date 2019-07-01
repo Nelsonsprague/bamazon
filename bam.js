@@ -19,12 +19,12 @@ function queryAll(){
             var productIds = res.map(function (res){
                 return res.item_id
             });
-            var productQuantity = res.map(function (res){
+            var stockQuantity = res.map(function (res){
                 return res.stock_quantity
             });
 }
 
-userBuy(productIds);
+userBuy(productIds, stockQuantity);
 });
 }
 
@@ -34,7 +34,7 @@ connection.connect(function(err){
 })
 queryAll();
 
-function userBuy(productIds){
+function userBuy(productIds, stockQuantity){
     inquirer.prompt({
         type: "list",
         name: "productList",
@@ -44,24 +44,36 @@ function userBuy(productIds){
     .then(function(answer){
         switch (answer.productList){
            case answer.productList:
-            buyItem(productQuantity);
+            buyItem(stockQuantity);
             break;
         }
     })
 }
 
-function buyItem(productQuantity){
+function buyItem(stockQuantity){
     inquirer.prompt({
         type: "input",
-        name: "productQuantity",
+        name: "purchaseQuantity",
         message: "How many would you like to buy?"
     })
     .then(function(answer){
-        if(answer<=productQuantity){
-            //update sqlThis means updating the SQL database to reflect the remaining quantity.
-// Once the update goes through, show the customer the total cost of their purchase.
+        var query = "SELECT stock_quantity FROM products WHERE id = userAnswer"
+        if(parseInt(answer.purchaseQuantity)===4){
+            completeTransaction();
         }else{
-            return "Insufficient quantity! You can't buy what we don't have!"
+            console.log("Insufficient quantity! You can't buy what we don't have!");
+            buyItem();
         }
     })
+}
+
+function completeTransaction(){
+    console.log("here")
+            var remainingQuantity = parseInt(stockQuantity)-=parseInt(answer.purchaseQuantity);
+            console.log(remainingQuantity)
+            var query = "UPDATE products SET stock_quantity = remainingQuantity WHERE stockQuantity = productQuantity"
+           connection.query(query, {remainingQuantity: answer.stock_quantity}, function(err, res){
+               if (err) throw err;
+               queryAll(res);
+           })
 }
