@@ -11,18 +11,15 @@ var connection = mysql.createConnection({
 function queryAll(){
     connection.query("SELECT *FROM products", function(err, res){
         if(err) throw err;
-        for(i=0;i<res.length;i++)
-        {
-            console.log("Item Id: ", res[i].item_id, "| Product Name: ", res[i].product_name, "| Department: ", res[i].department_name, "| Price: ", res[i].price, "| In Stock: ", res[i].stock_quantity);
-            var id = res[i].item_id;
-            
+        console.table(res)
+        
             var productIds = res.map(function (res){
                 return res.item_id
             });
             var stockQuantity = res.map(function (res){
                 return res.stock_quantity
             });
-}
+
 
 userBuy(productIds, stockQuantity);
 });
@@ -35,6 +32,8 @@ connection.connect(function(err){
 queryAll();
 
 function userBuy(productIds, stockQuantity){
+    
+
     inquirer.prompt({
         type: "list",
         name: "productList",
@@ -57,7 +56,7 @@ function buyItem(stockQuantity){
         message: "How many would you like to buy?"
     })
     .then(function(answer){
-        var query = "SELECT stock_quantity FROM products WHERE id = userAnswer"
+        var query = "SELECT stock_quantity FROM products WHERE id = ?"
         if(parseInt(answer.purchaseQuantity)===4){
             completeTransaction();
         }else{
@@ -69,9 +68,9 @@ function buyItem(stockQuantity){
 
 function completeTransaction(){
     console.log("here")
-            var remainingQuantity = parseInt(stockQuantity)-=parseInt(answer.purchaseQuantity);
+            var remainingQuantity = parseInt(stockQuantity) - parseInt(answer.purchaseQuantity);
             console.log(remainingQuantity)
-            var query = "UPDATE products SET stock_quantity = remainingQuantity WHERE stockQuantity = productQuantity"
+            var query = "UPDATE products SET stock_quantity = remainingQuantity WHERE productID = userID"
            connection.query(query, {remainingQuantity: answer.stock_quantity}, function(err, res){
                if (err) throw err;
                queryAll(res);
