@@ -17,13 +17,6 @@ function queryAll() {
         var productIds = res.map(function (res) {
             return res.item_id
         });
-        var productCost = res.map(function(res){
-            return res.price
-        })
-        var stockQuantity = res.map(function (res) {
-            return res.stock_quantity
-        });
-
 
         userBuy(productIds);
     });
@@ -89,6 +82,6 @@ function completeTransaction(response, answer2) {
             if(error) throw error;
         }
         );
-        console.log(`Products updated. We have ${remainingQuantity} left! Better buy before we run out!`);
-        queryAll();
+        console.log(`Products updated. We have ${remainingQuantity} left! Better buy before we run out!\n`);
+        
 }
